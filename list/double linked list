@@ -1,0 +1,142 @@
+struct DNode {
+    int data;
+    DNode* prev;
+    DNode* next;
+    DNode(int val) : data(val), prev(nullptr), next(nullptr) {}
+};
+
+class DoublyLinkedList {
+private:
+    DNode* head;
+    DNode* tail;
+
+public:
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // 1. Chèn đầu
+    void insertHead(int val) {
+        DNode* newNode = new DNode(val);
+        if (!head) {
+            head = tail = newNode;
+            return;
+        }
+        newNode->next = head;
+        head->prev = newNode;
+        head = newNode;
+    }
+
+    // 2. Chèn cuối
+    void insertTail(int val) {
+        DNode* newNode = new DNode(val);
+        if (!tail) {
+            head = tail = newNode;
+            return;
+        }
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+
+    // 3. Chèn vị trí i
+    void insertAt(int val, int pos) {
+        if (pos == 0) {
+            insertHead(val);
+            return;
+        }
+        DNode* temp = head;
+        for (int i = 0; temp && i < pos - 1; i++) temp = temp->next;
+        if (!temp) return;
+        if (temp == tail) {
+            insertTail(val);
+            return;
+        }
+
+        DNode* newNode = new DNode(val);
+        newNode->next = temp->next;
+        newNode->prev = temp;
+        temp->next->prev = newNode;
+        temp->next = newNode;
+    }
+
+    // 4. Xóa đầu
+    void deleteHead() {
+        if (!head) return;
+        DNode* temp = head;
+        head = head->next;
+        if (head) head->prev = nullptr;
+        else tail = nullptr;
+        delete temp;
+    }
+
+    // 5. Xóa cuối
+    void deleteTail() {
+        if (!tail) return;
+        DNode* temp = tail;
+        tail = tail->prev;
+        if (tail) tail->next = nullptr;
+        else head = nullptr;
+        delete temp;
+    }
+
+    // 6. Xóa vị trí i
+    void deleteAt(int pos) {
+        if (!head) return;
+        if (pos == 0) {
+            deleteHead();
+            return;
+        }
+        DNode* temp = head;
+        for (int i = 0; temp && i < pos; i++) temp = temp->next;
+        if (!temp) return;
+        if (temp == tail) {
+            deleteTail();
+            return;
+        }
+
+        temp->prev->next = temp->next;
+        temp->next->prev = temp->prev;
+        delete temp;
+    }
+
+    // 7. Duyệt đầu -> cuối
+    void printForward() {
+        cout << "[DLL Forward]: ";
+        DNode* temp = head;
+        while (temp) {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+        cout << endl;
+    }
+
+    // 8. Duyệt cuối -> đầu
+    void printBackward() {
+        cout << "[DLL Backward]: ";
+        DNode* temp = tail;
+        while (temp) {
+            cout << temp->data << " ";
+            temp = temp->prev;
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    cout << "--- DEMO DOUBLY LINKED LIST ---" << endl;
+    DoublyLinkedList dll;
+    dll.insertTail(10);
+    dll.insertTail(20);
+    dll.insertHead(5);        // Danh sách: 5 10 20
+    dll.insertAt(15, 2);      // Danh sách: 5 10 15 20
+
+    dll.printForward();       // In: 5 10 15 20
+    dll.printBackward();      // In: 20 15 10 5
+
+    dll.deleteHead();         // Còn: 10 15 20
+    dll.deleteTail();         // Còn: 10 15
+    dll.deleteAt(1);          // Xóa vị trí 1 (giá trị 15), còn: 10
+
+    dll.printForward();       // In: 10
+
+    return 0;
+}
